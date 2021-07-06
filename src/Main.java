@@ -23,7 +23,7 @@ public class Main {
 //        customerDB.createCustomer("sample","sample","sample","sample","sample");
         customerDB.printAllCustomersAllData();
 //        customerDB.deleteAllDataEntries();
-        //test git test
+
 
 
 
