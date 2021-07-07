@@ -10,6 +10,7 @@ public class UIManger {
     private final String goodbyeMessage = "Have a great day fucker!";
     Scanner scanner = new Scanner(System.in);
     Account account = new Account();
+    Customer customer = new Customer();
 
     public void displaySplashScreen() {
         //maybe center text in screen.
@@ -153,7 +154,7 @@ public class UIManger {
                     displayWithdrawMenu(custSSN);
                     break;
                 case 6:
-                    ///TODO left off here
+                    displayViewChangeInfoScreen(custSSN);
                     break;
                 case 7:
                     //handled in account class
@@ -169,6 +170,53 @@ public class UIManger {
                     break;
                 default:
                     System.out.println("Maybe try again and this time don't fuck it up.");
+            }
+        } while (!correctChoice);
+    }
+
+    private void displayViewChangeInfoScreen(String custSSN){
+        System.out.println("View/Change Information:\n");
+        //info to display first name, last name, username, and password(*******)
+        String firstName = customer.getFirstName(custSSN);
+        String lastName = customer.getLastName(custSSN);
+        String hiddenPassword = "***********";
+        String username = customer.getOnlineUsername(custSSN);
+
+        System.out.println("1. First Name: " + firstName +
+                "\n2. Last Name: " + lastName +
+                "\n3. Username: " + username +
+                "\n4. Password: " + hiddenPassword +
+                "\n\n Please enter the corresponding number for which field you would like to change, press '5' to change all fields, or press '0' to go back without change\n" +
+                "Enter your choice here:");
+        boolean correctChoice = false;
+        do {
+            int menuChoice = inputManager.menuInput();
+            if ((menuChoice == 1) || (menuChoice == 2) || (menuChoice == 3)) {
+                correctChoice = true;
+            }
+            switch (menuChoice) {
+                case 0:
+                    System.out.println("Cancelling information change...");
+                    displayCustomerAccountScreen(custSSN);
+                    break;
+                case 1:
+                    ///TODO left off here
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+
+                    break;
+                case 4:
+
+                    break;
+                case 5:
+
+                    break;
+                default:
+
+                    break;
             }
         } while (!correctChoice);
     }

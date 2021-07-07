@@ -75,6 +75,10 @@ public class DatabaseManager {
         return customerDB.getCustomerSSN(username);
     }
 
+    public String getOnlineUsername(String custSSN){
+        return customerDB.getOnlineUsername(custSSN);
+    }
+
     public String getAccountBalanceForTransfer(String accountNumber){
         String accountBalanceUnformatted = accountDB.getAccountBalance(accountNumber);
         String accountBalanceFormatted = accountBalanceUnformatted.replaceAll("[^0-9.]", "");

@@ -9,6 +9,8 @@ public class Customer {
 
     DatabaseManager databaseManager = new DatabaseManager();
 
+    public Customer(){}
+
     public Customer(String firstName, String lastName, String ssn, String onlineUsername, String onlinePassword) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -16,6 +18,18 @@ public class Customer {
         this.onlineUsername = onlineUsername;
         this.onlinePassword = onlinePassword;
         databaseManager.createNewCustomer(firstName, lastName, ssn, onlineUsername, onlinePassword);
+    }
+
+    public String getFirstName(String custSSN) {
+        return databaseManager.getCustomerFirstName(custSSN);
+    }
+
+    public String getLastName(String custSSN) {
+        return databaseManager.getCustomerLastName(custSSN);
+    }
+
+    public String getOnlineUsername(String custSSN){
+        return databaseManager.getOnlineUsername(custSSN);
     }
 
 }

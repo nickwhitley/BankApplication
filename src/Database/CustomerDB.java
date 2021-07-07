@@ -188,6 +188,25 @@ public class CustomerDB {
         return null;
     }
 
+    public String getOnlineUsername(String custSSN){
+        try{
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery("SELECT " + COLUMN_ONLINE_USERNAME + " FROM " + TABLE_CUSTOMERS +
+                    " WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
+
+            if (result.isClosed()){
+                System.out.println("Customer does not exist in Database.");
+            }
+            String returnedUsername = result.getString("OnlineUsername");
+            return returnedUsername;
+        } catch (SQLException exception) {
+            System.out.println("Error checking for customer in DB, check 'getOnlineUsername()' in CustomerDB.");
+            exception.printStackTrace();
+        }
+        System.out.println("Something went wrong in 'getOnlineUsername()' in CustomerDB.");
+        return null;
+    }
+
     public void printAllCustomersAllData() {
         try{
             Statement statement = conn.createStatement();
