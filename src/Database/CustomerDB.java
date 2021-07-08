@@ -207,6 +207,39 @@ public class CustomerDB {
         return null;
     }
 
+    public void setCustomerFirstName(String custSSN, String newFirstName){
+        try{
+            statement.execute(" UPDATE " + TABLE_CUSTOMERS +
+                    " SET " + COLUMN_CUST_FIRST_NAME + " = '" + newFirstName +
+                    "' WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
+        } catch (SQLException exception) {
+            System.out.println("ERROR when changing first name in DB, see 'setCustomerFirstName()' in CustomerDB");
+            exception.printStackTrace();
+        }
+    }
+
+    public void setCustomerLastName(String custSSN, String newLastName){
+        try{
+            statement.execute(" UPDATE " + TABLE_CUSTOMERS +
+                    " SET " + COLUMN_CUST_LAST_NAME + " = '" + newLastName +
+                    "' WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
+        } catch (SQLException exception) {
+            System.out.println("ERROR when changing last name in DB, see 'setCustomerLastName()' in CustomerDB");
+            exception.printStackTrace();
+        }
+    }
+
+    public void setOnlineUsername(String custSSN, String newUsername){
+        try{
+            statement.execute(" UPDATE " + TABLE_CUSTOMERS +
+                    " SET " + COLUMN_ONLINE_USERNAME + " = '" + newUsername +
+                    "' WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
+        } catch (SQLException exception) {
+            System.out.println("ERROR when changing username in DB, see 'setOnlineUsername()' in CustomerDB");
+            exception.printStackTrace();
+        }
+    }
+
     public void printAllCustomersAllData() {
         try{
             Statement statement = conn.createStatement();

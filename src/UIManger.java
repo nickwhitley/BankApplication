@@ -191,7 +191,7 @@ public class UIManger {
         boolean correctChoice = false;
         do {
             int menuChoice = inputManager.menuInput();
-            if ((menuChoice == 1) || (menuChoice == 2) || (menuChoice == 3)) {
+            if ((menuChoice > 0) || (menuChoice < 5)) {
                 correctChoice = true;
             }
             switch (menuChoice) {
@@ -200,25 +200,145 @@ public class UIManger {
                     displayCustomerAccountScreen(custSSN);
                     break;
                 case 1:
-                    ///TODO left off here
+                    displayFirstNameChangeScreen(custSSN);
                     break;
                 case 2:
-
+                    displayLastNameChangeScreen(custSSN);
                     break;
                 case 3:
-
+                    displayUsernameChangeScreen(custSSN);
                     break;
                 case 4:
-
+                    displayPasswordChangeScreen(custSSN);
                     break;
                 case 5:
-
+                    displayAllInfoChangeScreen(custSSN);
                     break;
                 default:
-
+                    System.out.println("Incorrect choice, please try again: ");
                     break;
             }
         } while (!correctChoice);
+    }
+
+    private void displayFirstNameChangeScreen(String custSSN) {
+        System.out.println("Change first name:\n");
+        System.out.println("Current first name: " + customer.getFirstName(custSSN));
+        System.out.println("Please enter your new first name: ");
+        String newFirstName = inputManager.getName();
+        System.out.println("\n" +
+                "You are changing your first name from \"" + customer.getFirstName(custSSN) +
+                "\" to \"" + newFirstName + "\". Is this correct? Select option below.");
+        System.out.println("1. Yes this is correct, commit change.\n" +
+                "2. No I need to change it.\n" +
+                "3. Cancel name change and go back to menu.");
+        boolean correctChoice = false;
+        do {
+            int menuChoice = inputManager.menuInput();
+            if ((menuChoice > 0) || (menuChoice < 3)) {
+                correctChoice = true;
+            }
+            switch (menuChoice) {
+                case 1:
+                    customer.setFirstName(custSSN, newFirstName);
+                    System.out.println("First name changed, returning to change info screen.");
+                    displayViewChangeInfoScreen(custSSN);
+                    break;
+                case 2:
+                    displayFirstNameChangeScreen(custSSN);
+                    break;
+                case 3:
+                    System.out.println("Cancelling....");
+                    displayCustomerAccountScreen(custSSN);
+                    break;
+                default:
+                    System.out.println("Incorrect choice, please try again: ");
+                    break;
+            }
+        } while (!correctChoice);
+    }
+
+    private void displayLastNameChangeScreen(String custSSN) {
+        clearScreen();
+        System.out.println("Change last name:\n");
+        System.out.println("Current last name: " + customer.getLastName(custSSN));
+        System.out.println("Please enter your new Last name: ");
+        String newLastName = inputManager.getName();
+        System.out.println("\n" +
+                "You are changing your last name from \"" + customer.getLastName(custSSN) +
+                "\" to \"" + newLastName + "\". Is this correct? Select option below.");
+        System.out.println("1. Yes this is correct, commit change.\n" +
+                "2. No I need to change it.\n" +
+                "3. Cancel name change and go back to menu.");
+        boolean correctChoice = false;
+        do {
+            int menuChoice = inputManager.menuInput();
+            if ((menuChoice > 0) || (menuChoice < 3)) {
+                correctChoice = true;
+            }
+            switch (menuChoice) {
+                case 1:
+                    customer.setLastName(custSSN, newLastName);
+                    System.out.println("Last name changed, returning to change info screen.");
+                    displayViewChangeInfoScreen(custSSN);
+                    break;
+                case 2:
+                    displayLastNameChangeScreen(custSSN);
+                    break;
+                case 3:
+                    System.out.println("Cancelling....");
+                    displayCustomerAccountScreen(custSSN);
+                    break;
+                default:
+                    System.out.println("Incorrect choice, please try again: ");
+                    break;
+            }
+        } while (!correctChoice);
+    }
+
+    private void displayUsernameChangeScreen(String custSSN) {
+        clearScreen();
+        System.out.println("Change username:\n");
+        System.out.println("Current username: " + customer.getOnlineUsername(custSSN));
+        System.out.println("Please enter your new username: ");
+        String newUsername = inputManager.createCustUsername();
+        System.out.println("\n" +
+                "You are changing your username from \"" + customer.getOnlineUsername(custSSN) +
+                "\" to \"" + newUsername + "\". Is this correct? Select option below.");
+        System.out.println("1. Yes this is correct, commit change.\n" +
+                "2. No I need to change it.\n" +
+                "3. Cancel name change and go back to menu.");
+        boolean correctChoice = false;
+        do {
+            int menuChoice = inputManager.menuInput();
+            if ((menuChoice > 0) || (menuChoice < 3)) {
+                correctChoice = true;
+            }
+            switch (menuChoice) {
+                case 1:
+                    customer.setOnlineUsername(custSSN, newUsername);
+                    System.out.println("Username changed, returning to change info screen.");
+                    displayViewChangeInfoScreen(custSSN);
+                    break;
+                case 2:
+                    displayUsernameChangeScreen(custSSN);
+                    break;
+                case 3:
+                    System.out.println("Cancelling....");
+                    displayCustomerAccountScreen(custSSN);
+                    break;
+                default:
+                    System.out.println("Incorrect choice, please try again: ");
+                    break;
+            }
+        } while (!correctChoice);
+    }
+
+    private void displayPasswordChangeScreen(String custSSN) {
+
+    }
+
+    private void displayAllInfoChangeScreen(String custSSN) {
     }
 
     private void displayWithdrawMenu(String custSSN) {
@@ -455,7 +575,11 @@ public class UIManger {
 
     }
 
-    private static void clearScreen(){
+    private void clearScreen(){
+        System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+    }
+
+    private static void splashScreen(){
         System.out.println("");
         System.out.println("=============================================================");
         System.out.println("");

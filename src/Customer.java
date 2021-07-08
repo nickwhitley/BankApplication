@@ -24,12 +24,24 @@ public class Customer {
         return databaseManager.getCustomerFirstName(custSSN);
     }
 
+    public void setFirstName(String custSSN, String newFirstName) {
+        databaseManager.setCustomerFirstName(custSSN, newFirstName);
+    }
+
     public String getLastName(String custSSN) {
         return databaseManager.getCustomerLastName(custSSN);
     }
 
+    public void setLastName(String custSSN, String newLastName){
+        databaseManager.setCustomerLastName(custSSN, newLastName);
+    }
+
     public String getOnlineUsername(String custSSN){
         return databaseManager.getOnlineUsername(custSSN);
+    }
+
+    public void setOnlineUsername(String custSSN, String newUsername){
+        databaseManager.setOnlineUsername(custSSN, newUsername);
     }
 
 }

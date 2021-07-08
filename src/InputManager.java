@@ -171,10 +171,15 @@ public class InputManager {
     }
 
     public String createCustUsername() {
-        String username = scanner.nextLine();
-        if (!validateUsernameFormat(username)) {
-            return createCustUsername();
-        }
+        String username;
+        do{
+            username = scanner.next();
+            scanner.nextLine();
+        } while (!validateUsernameFormat(username));
+//        String username = scanner.nextLine();
+//        if (!validateUsernameFormat(username)) {
+//            return createCustUsername();
+//        }
 
         return username;
     }

@@ -79,6 +79,18 @@ public class DatabaseManager {
         return customerDB.getOnlineUsername(custSSN);
     }
 
+    public void setCustomerFirstName(String custSSN, String newFirstName){
+        customerDB.setCustomerFirstName(custSSN, newFirstName);
+    }
+
+    public void setCustomerLastName(String custSSN, String newLastName){
+        customerDB.setCustomerLastName(custSSN, newLastName);
+    }
+
+    public void setOnlineUsername(String custSSN, String newUsername){
+        customerDB.setOnlineUsername(custSSN, newUsername);
+    }
+
     public String getAccountBalanceForTransfer(String accountNumber){
         String accountBalanceUnformatted = accountDB.getAccountBalance(accountNumber);
         String accountBalanceFormatted = accountBalanceUnformatted.replaceAll("[^0-9.]", "");
