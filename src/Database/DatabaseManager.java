@@ -91,6 +91,10 @@ public class DatabaseManager {
         customerDB.setOnlineUsername(custSSN, newUsername);
     }
 
+    public void setOnlinePassword(String custSSN, String newPassword){
+        customerDB.setOnlinePassword(custSSN, newPassword);
+    }
+
     public String getAccountBalanceForTransfer(String accountNumber){
         String accountBalanceUnformatted = accountDB.getAccountBalance(accountNumber);
         String accountBalanceFormatted = accountBalanceUnformatted.replaceAll("[^0-9.]", "");

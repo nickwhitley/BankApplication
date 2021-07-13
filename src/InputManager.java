@@ -228,13 +228,32 @@ public class InputManager {
         String password;
         do {
 
-            password = scanner.nextLine();
+            password = scanner.next();
+            scanner.nextLine();
             if (!validatePasswordFormat(password)) {
                 return getPasswordForLogin(username);
             }
-            if (!verifyPasswordIsCorrect(password, username)) {
+            if (!isPasswordCorrect(password, username)) {
                 System.out.println("Incorrect password, please try again.");
                 return getPasswordForLogin(username);
+            }
+            passedThrough = true;
+        } while (!passedThrough);
+        return password;
+    }
+
+    public String getPasswordForChange(String custSSN){
+        boolean passedThrough = false;
+        String password;
+        do {
+
+            password = scanner.nextLine();
+            if (!validatePasswordFormat(password)) {
+                return getPasswordForChange(custSSN);
+            }
+            if (!isPasswordCorrect(password, databaseManager.getOnlineUsername(custSSN))) {
+                System.out.println("Incorrect password, please try again.");
+                return getPasswordForChange(custSSN);
             }
             passedThrough = true;
         } while (!passedThrough);
@@ -268,7 +287,7 @@ public class InputManager {
         return transferFromAccountNumber;
     }
 
-    private boolean verifyPasswordIsCorrect(String password, String usernameToCheck) {
+    private boolean isPasswordCorrect(String password, String usernameToCheck) {
         String returnedPassword = databaseManager.getCustomerPassword(usernameToCheck);
         if (!returnedPassword.equals(password)) {
             return false;

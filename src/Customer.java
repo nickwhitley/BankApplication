@@ -44,4 +44,17 @@ public class Customer {
         databaseManager.setOnlineUsername(custSSN, newUsername);
     }
 
+    public void setOnlinePassword(String custSSN, String newPassword){
+        databaseManager.setOnlinePassword(custSSN, newPassword);
+    }
+
+    public void setAllInfo(String custSSN, String firstName, String lastName, String onlineUsername,
+                           String onlinePassword){
+        setFirstName(custSSN, firstName);
+        setLastName(custSSN, lastName);
+        setOnlineUsername(custSSN, onlineUsername);
+        setOnlinePassword(custSSN, onlinePassword);
+
+    }
+
 }

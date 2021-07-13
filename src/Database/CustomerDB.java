@@ -240,6 +240,17 @@ public class CustomerDB {
         }
     }
 
+    public void setOnlinePassword(String custSSN, String newPassword){
+        try{
+            statement.execute(" UPDATE " + TABLE_CUSTOMERS +
+                    " SET " + COLUMN_ONLINE_PASSWORD + " = '" + newPassword +
+                    "' WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
+        } catch (SQLException exception) {
+            System.out.println("ERROR when changing password in DB, see 'setOnlinePassword()' in CustomerDB");
+            exception.printStackTrace();
+        }
+    }
+
     public void printAllCustomersAllData() {
         try{
             Statement statement = conn.createStatement();

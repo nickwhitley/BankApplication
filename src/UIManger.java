@@ -335,10 +335,76 @@ public class UIManger {
     }
 
     private void displayPasswordChangeScreen(String custSSN) {
+        clearScreen();
+        System.out.println("Password Change: \n" +
+                "");
+        System.out.println("Please enter your current password: ");
+        String currentPassword = inputManager.getPasswordForChange(custSSN);
+        System.out.println("Current Password: " + currentPassword);
+        System.out.println("Please enter your new password: ");
+        String newPassword = inputManager.createCustPassword();
+        customer.setOnlinePassword(custSSN, newPassword);
+        System.out.println("Password changed successfully. Returning to main menu...");
+        displayCustomerAccountScreen(custSSN);
 
     }
 
     private void displayAllInfoChangeScreen(String custSSN) {
+        clearScreen();
+        System.out.println("Changing all information:\n");
+        System.out.println("Current first name: " + customer.getFirstName(custSSN) + "\n" +
+                "Please enter new first name:");
+        String newFirstName = inputManager.getName();
+        System.out.println("- - - - - -");
+        System.out.println("Current last name: " + customer.getLastName(custSSN) + "\n" +
+                "Please enter new last name:");
+        String newLastName = inputManager.getName();
+        System.out.println("- - - - - -");
+        System.out.println("Current username: " + customer.getOnlineUsername(custSSN) + "\n" +
+                "Please enter new username:");
+        String newUsername = inputManager.createCustUsername();
+        System.out.println("- - - - - -");
+        System.out.println("Please enter your current password: ");
+        String currentPassword = inputManager.getPasswordForChange(custSSN);
+        System.out.println("Current Password: " + currentPassword);
+        System.out.println("Please enter your new password: ");
+        String newPassword = inputManager.createCustPassword();
+        System.out.println("- - - - - -");
+        System.out.println("Please confirm information below: \n" +
+                "New first name: " + newFirstName + "\n" +
+                "New last name: " + newLastName + "\n" +
+                "New username: " + newUsername + "\n" +
+                "New password: " + newPassword + "\n");
+
+        System.out.println("1. Yes this is correct, commit change.\n" +
+                "2. No I need to change it.\n" +
+                "3. Cancel name change and go back to menu.");
+        boolean correctChoice = false;
+        do {
+            int menuChoice = inputManager.menuInput();
+            if ((menuChoice > 0) || (menuChoice < 3)) {
+                correctChoice = true;
+            }
+            switch (menuChoice) {
+                case 1:
+                    customer.setAllInfo(custSSN, newFirstName, newLastName, newUsername, newPassword);
+                    System.out.println("Information change successful.");
+                    displayViewChangeInfoScreen(custSSN);
+                    break;
+                case 2:
+                    displayAllInfoChangeScreen(custSSN);
+                    break;
+                case 3:
+                    System.out.println("Cancelling....");
+                    displayCustomerAccountScreen(custSSN);
+                    break;
+                default:
+                    System.out.println("Incorrect choice, please try again: ");
+                    break;
+            }
+        } while (!correctChoice);
+
+
     }
 
     private void displayWithdrawMenu(String custSSN) {
