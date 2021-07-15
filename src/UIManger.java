@@ -157,7 +157,7 @@ public class UIManger {
                     displayViewChangeInfoScreen(custSSN);
                     break;
                 case 7:
-                    //handled in account class
+                    ///TODO left of here. need to create transaction DB for this screen.
                     break;
                 case 8:
                     //handled in account class
