@@ -1,3 +1,5 @@
+package BankApplication;
+
 import Database.DatabaseManager;
 
 import java.math.BigDecimal;
@@ -26,7 +28,17 @@ public class InputManager {
     }
 
     public int menuInput() {
-        return scanner.nextInt();
+        int input;
+
+        //validates if user is only entering numbers
+        try{
+            input = scanner.nextInt();
+        } catch (InputMismatchException e){
+            System.out.println("Cannot contain letters or special characters. Please try again.");
+            scanner.nextLine();
+            return menuInput();
+        }
+        return input;
     }
 
     public String getName() {
@@ -295,7 +307,7 @@ public class InputManager {
             System.out.println("Password is correct.");
             return true;
         }
-        System.out.println("Something went wrong in verifyPasswordIsCorrect() in InputManager.");
+        System.out.println("Something went wrong in verifyPasswordIsCorrect() in BankApplication.InputManager.");
         return false;
     }
 
@@ -308,7 +320,9 @@ public class InputManager {
             System.out.println("Username can be no loner than 20 characters, please try again: ");
             return false;
         } else if(usernameToCheck.isEmpty()) {
-            System.out.println("Username can't be empty dipshit, please try again: ");
+            System.out.println("Username can't be empty, please try again: ");
+            return false;
+        } else if(usernameToCheck.equalsIgnoreCase("cancel")) {
             return false;
         }
         return true;

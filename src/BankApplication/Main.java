@@ -1,3 +1,5 @@
+package BankApplication;
+
 import Database.AccountDB;
 import Database.CustomerDB;
 import Database.TransactionDB;
@@ -5,13 +7,6 @@ import Database.TransactionDB;
 public class Main {
 
     public static void main(String[] args) {
-        /**
-         * ui manager
-         * account
-         * customer
-         * transactions
-         *
-         */
 
         //Troubleshooting section Begin
 
@@ -26,7 +21,8 @@ public class Main {
 //        customerDB.deleteAllDataEntries();
 
         TransactionDB transactionDB = new TransactionDB();
-        transactionDB.printAllTransactionsAllAccounts();
+        transactionDB.printAllCustomersAllAccounts();
+//        transactionDB.deleteTable();
 
 
 
@@ -37,6 +33,7 @@ public class Main {
 
 
         UIManger uiManger = new UIManger();
+        uiManger.displaySplashScreen();
         uiManger.displayInitialMenu();
     }
 

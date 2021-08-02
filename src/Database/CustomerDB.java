@@ -30,7 +30,7 @@ public class CustomerDB {
             statement = conn.createStatement();
         } catch (SQLException exception) {
             exception.printStackTrace();
-            System.out.println("Error connecting to Customer Database. Please check CustomerDB!");
+            System.out.println("Error connecting to BankApplication.Customer Database. Please check CustomerDB!");
         }
     }
 
@@ -121,7 +121,7 @@ public class CustomerDB {
                     " WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
 
             if (result.isClosed()) {
-                System.out.println("Customer does not exist in Database.");
+                System.out.println("BankApplication.Customer does not exist in Database.");
             }
             String returnedFirstName = result.getString("CustomerFirstName");
             return returnedFirstName;
@@ -140,7 +140,7 @@ public class CustomerDB {
                     " WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
 
             if (result.isClosed()){
-                System.out.println("Customer does not exist in Database.");
+                System.out.println("BankApplication.Customer does not exist in Database.");
             }
             String returnedLastName = result.getString("CustomerLastName");
             return returnedLastName;
@@ -195,7 +195,7 @@ public class CustomerDB {
                     " WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
 
             if (result.isClosed()){
-                System.out.println("Customer does not exist in Database.");
+                System.out.println("BankApplication.Customer does not exist in Database.");
             }
             String returnedUsername = result.getString("OnlineUsername");
             return returnedUsername;
@@ -226,6 +226,7 @@ public class CustomerDB {
         } catch (SQLException exception) {
             System.out.println("ERROR when changing last name in DB, see 'setCustomerLastName()' in CustomerDB");
             exception.printStackTrace();
+
         }
     }
 
@@ -277,7 +278,6 @@ public class CustomerDB {
             System.out.println("Error when printing all customers database contents");
             exception.printStackTrace();
         }
-        System.out.println();
     }
 
     public void deleteAllDataEntries() {

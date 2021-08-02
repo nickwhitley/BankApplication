@@ -3,6 +3,7 @@ package Database;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class AccountDB {
@@ -98,6 +99,23 @@ public class AccountDB {
         return accountBalance;
     }
 
+    public ArrayList<Integer> getAllCustAccountNumbers(String custSSN){
+        ArrayList<Integer> accountNumbers = new ArrayList<Integer>();
+        try{
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery("SELECT " + COLUMN_ACCOUNT_NUMBER + " FROM " + TABLE_ACCOUNTS +
+                    " WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';"   );
+            ResultSetMetaData resultData = result.getMetaData();
+            while (result.next()){
+                accountNumbers.add(result.getInt(resultData.getColumnCount()));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting all account number for customer, see getAllCustAccountNumbers() in AccountDB");
+            e.printStackTrace();
+        }
+        return accountNumbers;
+    }
+
     public void printAllAccountBalances(String custSSN) {
         try{
             Statement statement = conn.createStatement();
@@ -181,11 +199,40 @@ public class AccountDB {
         setAccountBalance(accountNumber, USFormat.format(newBalance));
     }
 
+    public void closeAccount(int accountNumber){
+        try {
+            statement.execute("DELETE FROM " + TABLE_ACCOUNTS + " WHERE " +
+                    COLUMN_ACCOUNT_NUMBER + " = '" + accountNumber + "';");
+            System.out.println("BankApplication.Account " + accountNumber + " has been closed.");
+        } catch (SQLException exception) {
+            System.out.println("Error when deleting account from table, see 'closeAccount()' in AccountDB");
+            exception.printStackTrace();
+        }
+    }
+
     public void depositFunds(String accountNumber, BigDecimal amount){
         BigDecimal currentBalance = new BigDecimal(getAccountBalance(accountNumber).replaceAll("[^0-9.]", ""));
         BigDecimal newBalance = currentBalance.add(amount);
         NumberFormat USFormat = NumberFormat.getCurrencyInstance(Locale.US);
         setAccountBalance(accountNumber, USFormat.format(newBalance));
+    }
+
+    public boolean doesCustHaveOpenAccount(String custSSN){
+        try{
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery("SELECT * FROM " + TABLE_ACCOUNTS +
+                    " WHERE " + COLUMN_CUST_SSN + " = '" + custSSN + "';");
+
+            if (result.isClosed()){
+                return false;
+            }
+            return true;
+        } catch (SQLException exception){
+            System.out.println("Error when checking if customer has open account, check doesCustHaveOpenAccount()" +
+                    " in AccountDB.");
+            exception.printStackTrace();
+        }
+        return true;
     }
 
     private void setAccountBalance(String accountNumber, String accountBalance){
@@ -198,6 +245,7 @@ public class AccountDB {
             exception.printStackTrace();
         }
     }
+
 
     public void deleteAllDataEntries() {
         try{

@@ -3,6 +3,7 @@ package Database;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class TransactionDB {
 
@@ -19,6 +20,16 @@ public class TransactionDB {
 
     private static Connection conn;
     private static Statement statement;
+
+    /*
+    Transaction details different types:
+    withdrawal
+    deposit
+    internal transfer
+    external transfer
+    account closure
+    initial deposit
+     */
 
     //create connection to DB
     static {
@@ -47,7 +58,62 @@ public class TransactionDB {
         }
     }
 
-    public void createTransaction(int accountNumber, String transactionDetail, String transactionAmount,
+    public void createWithdrawalTransaction(int accountNumber, String transactionDetail, String transactionAmount, String fromAccount){
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        String transactionDate = dateFormat.format(Date.valueOf(LocalDate.now()));
+
+        try {
+            statement.execute("INSERT INTO " + TABLE_TRANSACTIONS +
+                    " (" + COLUMN_ACCOUNT_NUMBER + ", " +
+                    COLUMN_TRANSACTION_DETAIL + ", " +
+                    COLUMN_TRANSACTION_DATE + ", " +
+                    COLUMN_TRANSACTION_AMOUNT + ", " +
+                    COLUMN_TO_ACCOUNT + ", " +
+                    COLUMN_FROM_ACCOUNT + ") " +
+                    "VALUES('" +
+                    accountNumber + "', '" +
+                    transactionDetail + "', '" +
+                    transactionDate + "', '" +
+                    transactionAmount + "', '-', '" +
+                    fromAccount + "')");
+        } catch (SQLException exception) {
+            System.out.println("Error when adding new transaction to transaction DB" +
+                    ". Please see createTransaction() in TransactionDB class.");
+            exception.printStackTrace();
+        }
+    }
+
+    //used for deposit
+    public void createDepositTransaction(int accountNumber, String transactionDetail, String transactionAmount,
+                                  String toAccount){
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        String transactionDate = dateFormat.format(Date.valueOf(LocalDate.now()));
+
+        try {
+            statement.execute("INSERT INTO " + TABLE_TRANSACTIONS +
+                    " (" + COLUMN_ACCOUNT_NUMBER + ", " +
+                    COLUMN_TRANSACTION_DETAIL + ", " +
+                    COLUMN_TRANSACTION_DATE + ", " +
+                    COLUMN_TRANSACTION_AMOUNT + ", " +
+                    COLUMN_TO_ACCOUNT + ", " +
+                    COLUMN_FROM_ACCOUNT + ") " +
+                    "VALUES('" +
+                    accountNumber + "', '" +
+                    transactionDetail + "', '" +
+                    transactionDate + "', '" +
+                    transactionAmount + "', '" +
+                    toAccount + "', '-')");
+        } catch (SQLException exception) {
+            System.out.println("Error when adding new transaction to transaction DB" +
+                    ". Please see createTransaction() in TransactionDB class.");
+            exception.printStackTrace();
+        }
+    }
+
+    //used for transfers
+    public void createTransferTransaction(int accountNumber, String transactionDetail, String transactionAmount,
                                   String toAccount, String fromAccount){
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -75,6 +141,7 @@ public class TransactionDB {
         }
     }
 
+    //print account transactions for one account
     public void printAccountTransactions(int accountNumber){
         try{
             Statement statement = conn.createStatement();
@@ -103,12 +170,18 @@ public class TransactionDB {
         }
     }
 
+    //print account transactions for all accounts
     public void printCustomerTransactions(String custSSN){
-        //create array of customer account numbers and iterate through to add each one, sort by date
+        DatabaseManager databaseManager = new DatabaseManager();
+        ArrayList<Integer> accountNumbers = databaseManager.getAllCustAccountNumber(custSSN);
+        for (int i = 0; i<accountNumbers.size(); i++){
+            printAccountTransactions(accountNumbers.get(i));
+        }
+
     }
 
     //WARNING!!! Prints all transactions from every account
-    public void printAllTransactionsAllAccounts(){
+    public void printAllCustomersAllAccounts(){
         try{
             Statement statement = conn.createStatement();
             ResultSet result = statement.executeQuery("SELECT * FROM " + TABLE_TRANSACTIONS);

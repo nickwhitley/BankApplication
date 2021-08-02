@@ -2,6 +2,7 @@ package Database;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class DatabaseManager {
@@ -10,6 +11,7 @@ public class DatabaseManager {
     //manage input formatting in this class
     AccountDB accountDB = new AccountDB();
     CustomerDB customerDB = new CustomerDB();
+    TransactionDB transactionDB = new TransactionDB();
 
     public void createNewAccount(int accountNumber, String accountType, BigDecimal initialDeposit,
                                  String custFirstName, String custLastName, String custSSN) {
@@ -79,6 +81,14 @@ public class DatabaseManager {
         return customerDB.getOnlineUsername(custSSN);
     }
 
+    public void printAllCustTransactions(String custSSN){
+        transactionDB.printCustomerTransactions(custSSN);
+    }
+
+    public void printAccountTransactions(int accountNumber){
+        transactionDB.printAccountTransactions(accountNumber);
+    }
+
     public void setCustomerFirstName(String custSSN, String newFirstName){
         customerDB.setCustomerFirstName(custSSN, newFirstName);
     }
@@ -95,10 +105,25 @@ public class DatabaseManager {
         customerDB.setOnlinePassword(custSSN, newPassword);
     }
 
+    public ArrayList<Integer> getAllCustAccountNumber(String custSSN){
+        ArrayList<Integer> accountNumbers = accountDB.getAllCustAccountNumbers(custSSN);
+        return accountNumbers;
+    }
+
     public String getAccountBalanceForTransfer(String accountNumber){
         String accountBalanceUnformatted = accountDB.getAccountBalance(accountNumber);
         String accountBalanceFormatted = accountBalanceUnformatted.replaceAll("[^0-9.]", "");
         return accountBalanceFormatted;
+    }
+
+    public BigDecimal getAccountBalance(int accountNumber){
+        //convert account num to String for DB search
+        BigDecimal accountBalance = new BigDecimal(accountDB.getAccountBalance(Integer.toString(accountNumber)).replaceAll("[^0-9.]", ""));
+        return accountBalance;
+    }
+
+    public void closeAccount(int accountNumber){
+        accountDB.closeAccount(accountNumber);
     }
 
     public void getAllAccountBalances(String custSSN) {
@@ -107,5 +132,9 @@ public class DatabaseManager {
 
     public boolean checkIfCustOwnsAccountNumber(String custSSN, String accountNumber) {
         return accountDB.checkIfCustOwnsAccountNumber(custSSN, accountNumber);
+    }
+
+    public boolean doesCustHaveOpenAccounts(String custSSN) {
+        return accountDB.doesCustHaveOpenAccount(custSSN);
     }
 }

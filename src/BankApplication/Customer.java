@@ -1,3 +1,5 @@
+package BankApplication;
+
 import Database.DatabaseManager;
 
 public class Customer {
@@ -18,6 +20,10 @@ public class Customer {
         this.onlineUsername = onlineUsername;
         this.onlinePassword = onlinePassword;
         databaseManager.createNewCustomer(firstName, lastName, ssn, onlineUsername, onlinePassword);
+    }
+
+    public void printAllAccountTransactions(String custSSN){
+        databaseManager.printAllCustTransactions(custSSN);
     }
 
     public String getFirstName(String custSSN) {

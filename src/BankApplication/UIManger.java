@@ -1,14 +1,14 @@
+package BankApplication;
+
 import Database.DatabaseManager;
 
 import java.math.BigDecimal;
-import java.util.Scanner;
+import java.util.ArrayList;
 
 public class UIManger {
 
-    private InputManager inputManager = new InputManager();
-    private DatabaseManager databaseManager = new DatabaseManager();
-    private final String goodbyeMessage = "Have a great day fucker!";
-    Scanner scanner = new Scanner(System.in);
+    private final InputManager inputManager = new InputManager();
+    private final DatabaseManager databaseManager = new DatabaseManager();
     Account account = new Account();
     Customer customer = new Customer();
 
@@ -31,6 +31,7 @@ public class UIManger {
                 "3. Exit application.");
 
         int menuChoice = inputManager.menuInput();
+        String goodbyeMessage = "Have a great day!";
         switch (menuChoice) {
             case 1:
                 displayCreateOnlineAccountScreen();
@@ -98,16 +99,20 @@ public class UIManger {
                     "2. No, I need to change some info.\n" +
                     "Enter choice: ");
             int choice = inputManager.menuInput();
-            if (choice == 1) {
-                System.out.println("Account has been created successfully.");
-                infoConfirmed = true;
-                Customer customer = new Customer(firstName, lastName, custSSN, username, password);
-                displayCustomerAccountScreen(custSSN);
-            } else if(choice == 2) {
-                System.out.println("Okay.... maybe do it right this time.");
-                displayCreateOnlineAccountScreen();
-            } else {
-                System.out.println("Idiot....");
+            switch (choice){
+                case 1:
+                    System.out.println("BankApplication.Account has been created successfully.");
+                    infoConfirmed = true;
+                    Customer customer = new Customer(firstName, lastName, custSSN, username, password);
+                    displayCustomerAccountScreen(custSSN);
+                    break;
+                case 2:
+                    System.out.println("Information not correct, going back to change.");
+                    displayCreateOnlineAccountScreen();
+                    break;
+                default:
+                    System.out.println("Incorrect input, please try again.");
+                    break;
             }
         } while(!infoConfirmed);
     }
@@ -130,12 +135,11 @@ public class UIManger {
                 "9. Log out.\n" +
                 "Enter choice: ");
 
-        boolean correctChoice = false;
+        ///todo test if this works
+        boolean correctChoice;
         do {
             int menuChoice = inputManager.menuInput();
-            if(menuChoice > 0 && menuChoice < 10) {
-                correctChoice = true;
-            }
+            correctChoice = true;
             switch (menuChoice) {
                 case 1:
                     openBankAccount(custSSN);
@@ -157,10 +161,10 @@ public class UIManger {
                     displayViewChangeInfoScreen(custSSN);
                     break;
                 case 7:
-                    ///TODO left of here. need to create transaction DB for this screen.
+                    displayTransactionLogScreen(custSSN);
                     break;
                 case 8:
-                    //handled in account class
+                    displayCloseAccountScreen(custSSN);
                     break;
                 case 9:
                     System.out.println("Logging you out. See you again soon!");
@@ -169,9 +173,190 @@ public class UIManger {
                     displayInitialMenu();
                     break;
                 default:
-                    System.out.println("Maybe try again and this time don't fuck it up.");
+                    correctChoice = false;
+                    System.out.println("Incorrect option, please try again.");
             }
         } while (!correctChoice);
+    }
+
+    private void displayCloseAccountScreen(String custSSN) {
+
+        clearScreen();
+        customerAccountCheck(custSSN);
+
+        System.out.println("Close BankApplication.Account:\n");
+        System.out.println("Your open accounts:");
+        //prints account balances
+        account.printAllBalances(custSSN);
+        System.out.println();
+
+        //prints all accounts
+        ArrayList<Integer> accountNumbers = databaseManager.getAllCustAccountNumber(custSSN);
+        for (int i = 0; i < accountNumbers.size(); i++){
+            System.out.println((i + 1) + ". " + accountNumbers.get(i));
+        }
+
+        System.out.println("Select one of your accounts to close or enter '0' to cancel");
+        int menuChoice = inputManager.menuInput();
+        if ((menuChoice < 0) || (menuChoice > accountNumbers.size())){
+            System.out.println("Incorrect choice, please try again.");
+            displayCloseAccountScreen(custSSN);
+        }
+        if (menuChoice == 0){
+            System.out.println("Cancelling and going back to main menu...");
+            displayCustomerAccountScreen(custSSN);
+        }
+        int accountSelected = accountNumbers.get(menuChoice-1);
+
+        ///TODO could simplify code below
+        //verifies account selected is correct account before committing
+        boolean correctChoice = false;
+        int menuChoiceForAccountSelected;
+        do {
+            System.out.println("You have selected:" + accountSelected);
+            System.out.println("Please select an option below:\n" +
+                    "1. This is correct, close this account.\n" +
+                    "2. This is not correct, choose different account\n" +
+                    "3. Cancel account closing.");
+            menuChoiceForAccountSelected = inputManager.menuInput();
+            if ((menuChoiceForAccountSelected >0) && (menuChoiceForAccountSelected <= 3)){
+                correctChoice = true;
+            } else{
+                System.out.println("Incorrect choice, please try again.\n");
+            }
+        } while (!correctChoice);
+
+        switch (menuChoiceForAccountSelected){
+            case 1:
+                ///todo account stills acts like it has a remaining amount
+                BigDecimal compareNum = new BigDecimal("0.00");
+                if (databaseManager.getAccountBalance(accountSelected).compareTo(compareNum) == 0){
+                    //close account
+                    account.closeAccount(accountSelected);
+                    System.out.println("BankApplication.Account: " + accountSelected + " successfully closed.");
+                    displayCustomerAccountScreen(custSSN);
+                } else {displayCloseAccountRemainingBalanceScreen(accountSelected, custSSN);}
+                break;
+            case 2:
+                displayCloseAccountScreen(custSSN);
+                break;
+            case 3:
+                System.out.println("Cancelling and going back to main menu.");
+                displayCustomerAccountScreen(custSSN);
+                break;
+        }
+
+
+    }
+
+    private void displayCloseAccountRemainingBalanceScreen(int accountSelected, String custSSN) {
+        System.out.println("BankApplication.Account: " + accountSelected + " has a remaining balance of $" + account.getAccountBalance(accountSelected));
+
+        boolean correctChoice = false;
+        int menuChoiceForBalance;
+        do {
+            System.out.println("What would you like to do with the remaining balance? Select an option below:\n" +
+                    "0. Cancel.\n" +
+                    "1. Transfer to different account.\n" +
+                    "2. Withdraw funds\n");
+            menuChoiceForBalance = inputManager.menuInput();
+            if ((menuChoiceForBalance >= 0) && (menuChoiceForBalance <= 2)){
+                correctChoice = true;
+            } else{
+                System.out.println("Incorrect choice, please try again.\n");
+            }
+        } while (!correctChoice);
+
+        switch (menuChoiceForBalance) {
+            case 0:
+                System.out.println("Cancelling account closure.");
+                displayCustomerAccountScreen(custSSN);
+                break;
+            case 1:
+                System.out.println("Transfer to a different account:");
+                displayAccountClosureTransferMenu(accountSelected, custSSN);
+                break;
+            case 2:
+                System.out.println("Withdraw the funds.");
+                account.commitClosingWithdrawal(Integer.toString(accountSelected));
+                break;
+        }
+    }
+
+    private void displayAccountClosureTransferMenu(int accountBeingClosed, String custSSN) {
+        ArrayList<Integer> accountNumbers = databaseManager.getAllCustAccountNumber(custSSN);
+        accountNumbers.remove(accountNumbers.indexOf(accountBeingClosed));
+        System.out.println("Select which account you would like the remaining funds to be transferred to:");
+        System.out.println("0. Cancel and go back to main menu.");
+        for (int i = 0; i < accountNumbers.size(); i++){
+            System.out.println((i+1) + ". " + accountNumbers.get(i));
+        }
+        int menuChoice = inputManager.menuInput();
+        boolean correctChoice = (menuChoice >= 0) && (menuChoice <= accountNumbers.size());
+        if (!correctChoice){
+            System.out.println("Incorrect choice, please try again.");
+            displayAccountClosureTransferMenu(accountBeingClosed, custSSN);
+        } else {
+            if (menuChoice == 0){
+                System.out.println("Going back to main menu.");
+                displayCustomerAccountScreen(custSSN);
+            }
+            account.commitClosingTransfer(Integer.toString(accountBeingClosed),accountNumbers.get(menuChoice-1).toString());
+        }
+
+    }
+
+    private void displayTransactionLogScreen(String custSSN){
+        clearScreen();
+        customerAccountCheck(custSSN);
+
+        System.out.println("Transaction Log:");
+        System.out.println("Please select an option below:\n" +
+                "1. View transactions for specific account.\n" +
+                "2. View all transactions.\n" +
+                "3. Return to account menu.\n");
+
+            int menuChoice = inputManager.menuInput();
+
+            switch (menuChoice) {
+                case 1:
+                    displaySelectAccountForTransaction(custSSN);
+                    break;
+                case 2:
+                    customer.printAllAccountTransactions(custSSN);
+                    displayCustomerAccountScreen(custSSN);
+                    break;
+                case 3:
+                    displayCustomerAccountScreen(custSSN);
+                    break;
+                default:
+                    System.out.println("Incorrect choice, please try again: ");
+                    displayTransactionLogScreen(custSSN);
+                    break;
+            }
+    }
+
+    private void displaySelectAccountForTransaction(String custSSN) {
+        System.out.println("Please select one of your accounts or enter '0' to cancel:\n");
+        ArrayList<Integer> accountNumbers = databaseManager.getAllCustAccountNumber(custSSN);
+        for (int i = 0; i < accountNumbers.size(); i++){
+            System.out.println((i + 1) + ". " + accountNumbers.get(i));
+        }
+
+        int menuChoice = inputManager.menuInput();
+        boolean correctChoice = (menuChoice >= 0) && (menuChoice <= accountNumbers.size());
+        if (!correctChoice){
+            System.out.println("Incorrect choice, please try again.");
+            displaySelectAccountForTransaction(custSSN);
+        } else {
+            if (menuChoice == 0){
+                System.out.println("Going back to main menu.");
+                displayCustomerAccountScreen(custSSN);
+            }
+            account.printAccountTransactions(accountNumbers.get(menuChoice -1));
+        }
+
+        displayCustomerAccountScreen(custSSN);
     }
 
     private void displayViewChangeInfoScreen(String custSSN){
@@ -191,7 +376,7 @@ public class UIManger {
         boolean correctChoice = false;
         do {
             int menuChoice = inputManager.menuInput();
-            if ((menuChoice > 0) || (menuChoice < 5)) {
+            if ((menuChoice > 0) && (menuChoice < 5)) {
                 correctChoice = true;
             }
             switch (menuChoice) {
@@ -235,7 +420,7 @@ public class UIManger {
         boolean correctChoice = false;
         do {
             int menuChoice = inputManager.menuInput();
-            if ((menuChoice > 0) || (menuChoice < 3)) {
+            if ((menuChoice > 0) && (menuChoice < 3)) {
                 correctChoice = true;
             }
             switch (menuChoice) {
@@ -273,7 +458,7 @@ public class UIManger {
         boolean correctChoice = false;
         do {
             int menuChoice = inputManager.menuInput();
-            if ((menuChoice > 0) || (menuChoice < 3)) {
+            if ((menuChoice > 0) && (menuChoice < 3)) {
                 correctChoice = true;
             }
             switch (menuChoice) {
@@ -311,7 +496,7 @@ public class UIManger {
         boolean correctChoice = false;
         do {
             int menuChoice = inputManager.menuInput();
-            if ((menuChoice > 0) || (menuChoice < 3)) {
+            if ((menuChoice > 0) && (menuChoice < 3)) {
                 correctChoice = true;
             }
             switch (menuChoice) {
@@ -382,7 +567,7 @@ public class UIManger {
         boolean correctChoice = false;
         do {
             int menuChoice = inputManager.menuInput();
-            if ((menuChoice > 0) || (menuChoice < 3)) {
+            if ((menuChoice > 0) && (menuChoice < 3)) {
                 correctChoice = true;
             }
             switch (menuChoice) {
@@ -408,6 +593,7 @@ public class UIManger {
     }
 
     private void displayWithdrawMenu(String custSSN) {
+        customerAccountCheck(custSSN);
         System.out.println("Withdraw:");
         account.printAllBalances(custSSN);
         System.out.println("Please enter the account number you would like to withdraw from:");
@@ -450,6 +636,7 @@ public class UIManger {
     }
 
     private void displayDepositMenu(String custSSN) {
+        customerAccountCheck(custSSN);
         System.out.println("Deposit:");
         account.printAllBalances(custSSN);
         System.out.println("Please enter the account number you would like to deposit to:");
@@ -492,6 +679,7 @@ public class UIManger {
     }
 
     private void displayTransferMenu(String custSSN) {
+        customerAccountCheck(custSSN);
         System.out.println("Please choose one of the following:\n" +
                 "1. Internal Transfer.\n" +
                 "2. External Transfer. (Function not available at this time.)\n" +
@@ -508,7 +696,7 @@ public class UIManger {
                     displayInternalTransferMenu(custSSN);
                     break;
                 case 2:
-                    System.out.println("You fucking moron.");
+                    System.out.println("This function does not work at this time.");
                     break;
                 case 3:
                     displayCustomerAccountScreen(custSSN);
@@ -574,16 +762,21 @@ public class UIManger {
         System.out.println("Open new bank account.\n" +
                 "- - - - - - - - - - - - - -");
         System.out.println("Choose which type of account you would like to open.\n" +
+                "0. Cancel account opening." +
                 "1. Checking.\n" +
                 "2. Savings");
-        int accountChoice = inputManager.menuInput();
+
         boolean validChoice = false;
-        if (accountChoice == 1 || accountChoice == 2){
-            validChoice = true;
-        }
         String accountType = "error";
         do {
+            int accountChoice = inputManager.menuInput();
+            validChoice = accountChoice == 1 || accountChoice == 2;
+
             switch (accountChoice) {
+                case 0:
+                    System.out.println("Cancelled account opening.");
+                    displayCustomerAccountScreen(custSSN);
+                    break;
                 case 1:
                     accountType = "checking";
                     break;
@@ -591,10 +784,10 @@ public class UIManger {
                     accountType = "savings";
                     break;
                 default:
-                    System.out.println("Pick the right one dipshit.");
+                    System.out.println("Incorrect selection, please try again.");
                     break;
             }
-        } while(validChoice = false);
+        } while(validChoice == false);
         System.out.println("You have selected a " + accountType + ".");
 
         System.out.println("How much would you like to initially deposit?");
@@ -625,51 +818,15 @@ public class UIManger {
 
     }
 
-    public void displayOnlineAccountCreateScreen() {
-        System.out.println("Please create your online account using a username and password.\n" +
-                "What would you like your username to be, please note usernames can only contain up to 20 characters.\n" +
-                "Enter your username below: ");
-
-        String username = inputManager.createCustUsername();
-        System.out.println("Your username is: " + username);
-        System.out.println("\n" +
-                "Now please enter your password, your password can only contain letters and numbers, no special characters.\n" +
-                "Passwords must be at least 8 characters in length but can't be longer than 20.");
-        String password = inputManager.createCustPassword();
-        System.out.println("Your password is: " + password);
-
-
-    }
-
     private void clearScreen(){
         System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
     }
 
-    private static void splashScreen(){
-        System.out.println("");
-        System.out.println("=============================================================");
-        System.out.println("");
-        System.out.println("BBBBBBBBBBBBBBBBB    TTTTTTTTTTTTTTTTTTTTTTT DDDDDDDDDDDDD              BBBBBBBBBBBBBBBBB                                         kkkkkkkk");
-        System.out.println("B::::::::::::::::B   T:::::::::::::::::::::T D::::::::::::DDD           B::::::::::::::::B                                        k::::::k");
-        System.out.println("B::::::BBBBBB:::::B  T:::::::::::::::::::::T D:::::::::::::::DD         B::::::BBBBBB:::::B                                       k::::::k           ");
-        System.out.println("BB:::::B     B:::::B T:::::TT:::::::TT:::::T DDD:::::DDDDD:::::D        BB:::::B     B:::::B                                      k::::::k           ");
-        System.out.println("  B::::B     B:::::B TTTTTT  T:::::T  TTTTTT   D:::::D    D:::::D         B::::B     B:::::B   aaaaaaaaaaaaa   nnnn  nnnnnnnn      k:::::k    kkkkkkk");
-        System.out.println("  B::::B     B:::::B         T:::::T           D:::::D     D:::::D        B::::B     B:::::B   a::::::::::::a  n:::nn::::::::nn    k:::::k   k:::::k ");
-        System.out.println("  B::::BBBBBB:::::B          T:::::T           D:::::D     D:::::D        B::::BBBBBB:::::B    aaaaaaaaa:::::a n::::::::::::::nn   k:::::k  k:::::k  ");
-        System.out.println("  B:::::::::::::BB           T:::::T           D:::::D     D:::::D        B:::::::::::::BB              a::::a nn:::::::::::::::n  k:::::k k:::::k   ");
-        System.out.println("  B::::BBBBBB:::::B          T:::::T           D:::::D     D:::::D        B::::BBBBBB:::::B      aaaaaaa:::::a   n:::::nnnn:::::n  k::::::k:::::k    ");
-        System.out.println("  B::::B     B:::::B         T:::::T           D:::::D     D:::::D        B::::B     B:::::B   aa::::::::::::a   n::::n    n::::n  k:::::::::::k     ");
-        System.out.println("  B::::B     B:::::B         T:::::T           D:::::D     D:::::D        B::::B     B:::::B  a::::aaaa::::::a   n::::n    n::::n  k:::::::::::k     ");
-        System.out.println("  B::::B     B:::::B         T:::::T           D:::::D    D:::::D         B::::B     B:::::B a::::a    a:::::a   n::::n    n::::n  k::::::k:::::k    ");
-        System.out.println("BB:::::BBBBBB::::::B       TT:::::::TT       DDD:::::DDDDD:::::D        BB:::::BBBBBB::::::B a::::a    a:::::a   n::::n    n::::n k::::::k k:::::k   ");
-        System.out.println("B:::::::::::::::::B        T:::::::::T       D:::::::::::::::DD         B:::::::::::::::::B  a:::::aaaa::::::a   n::::n    n::::n k::::::k  k:::::k  ");
-        System.out.println("B::::::::::::::::B         T:::::::::T       D::::::::::::DDD           B::::::::::::::::B    a::::::::::aa:::a  n::::n    n::::n k::::::k   k:::::k ");
-        System.out.println("BBBBBBBBBBBBBBBBB          TTTTTTTTTTT       DDDDDDDDDDDDD              BBBBBBBBBBBBBBBBB      aaaaaaaaaa  aaaa  nnnnnn    nnnnnn kkkkkkkk    kkkkkkk");
-        System.out.println("Donald's bank sucks.");
-        System.out.println("\n" +
-                "");
+    private void customerAccountCheck(String custSSN){
+        if (!account.doesCustHaveOpenAccount(custSSN)){
+            System.out.println("You currently don't have any bank accounts open.");
+            displayCustomerAccountScreen(custSSN);
+        }
     }
-
-
 
 }
